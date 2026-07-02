@@ -26,7 +26,7 @@ else
   exit 1
 fi
 
-tr '\r\n\t' '   ' < "$TMP_FILE" | sed 's/  */ /g; s/^ //; s/ $//' > "$IP_FILE"
+tr -s '[:space:]' '\n' < "$TMP_FILE" | sed '/^$/d' > "$IP_FILE"
 rm -f "$TMP_FILE"
 
 if [ ! -s "$IP_FILE" ]; then
