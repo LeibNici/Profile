@@ -40,5 +40,5 @@ if ! grep -Eq '([0-9]{1,3}\.){3}[0-9]{1,3}' "$IP_FILE"; then
 fi
 
 echo "IP 池已保存到 $IP_FILE"
-echo "开始执行：./cfst -f $IP_FILE -t 50 -tp 8443"
-./cfst -f "$IP_FILE" -t 50 -tp 8443
+echo "开始执行：./cfst -f $IP_FILE -n 20 -t 10 -tp 8443 -httping -tlr 0.1"
+./cfst -f "$IP_FILE" -n 20 -t 10 -tp 8443 -httping -tlr 0.1
