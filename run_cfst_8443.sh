@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-IP_URL="https://v4.gh-proxy.org/https://raw.githubusercontent.com/LeibNici/Profile/refs/heads/master/domainIp.txt"
+IP_URL="https://bestcf.pages.dev/uouin/all.txt"
 IP_FILE="ip.txt"
 CFST_DIR="${1:-$(pwd)}"
 
@@ -26,7 +26,20 @@ else
   exit 1
 fi
 
-tr -s '[:space:]' '\n' < "$TMP_FILE" | sed '/^$/d' > "$IP_FILE"
+# BestCF 的每行格式为 "IP:端口#说明"。提取全部有效 IPv4，
+# 丢弃端口和说明文字，并去重后交给 cfst 测速。
+awk '
+  {
+    ip = $0
+    sub(/:.*/, "", ip)
+    count = split(ip, octet, ".")
+    valid = (count == 4)
+    for (i = 1; i <= 4 && valid; i++) {
+      if (octet[i] !~ /^[0-9]+$/ || octet[i] > 255) valid = 0
+    }
+    if (valid && !seen[ip]++) print ip
+  }
+' "$TMP_FILE" > "$IP_FILE"
 rm -f "$TMP_FILE"
 
 if [ ! -s "$IP_FILE" ]; then
@@ -35,7 +48,7 @@ if [ ! -s "$IP_FILE" ]; then
 fi
 
 if ! grep -Eq '([0-9]{1,3}\.){3}[0-9]{1,3}' "$IP_FILE"; then
-  echo "错误：$IP_FILE 里没有识别到 IPv4，可能下载到了错误页面。"
+  echo "错误：$IP_FILE 里没有可供 cfst 测速的 IP，可能下载到了错误页面。"
   exit 1
 fi
 
